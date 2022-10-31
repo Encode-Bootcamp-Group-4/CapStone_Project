@@ -14,6 +14,9 @@ export class LandingPageComponent implements OnInit {
   }
 
   playSnake  = async() => {
-    this.router.navigate(['/snake-game']);
+    console.log("playSnake");
+    this.router.navigate(['/game-board']);
+    
   }
+
 }

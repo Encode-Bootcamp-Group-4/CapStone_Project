@@ -33,12 +33,7 @@
               "node_modules/bootstrap-icons/font/bootstrap-icons.css"
             ],
             "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
-              "src/app/snake-game/food.js",
-              "src/app/snake-game/game.js",
-              "src/app/snake-game/grid.js",
-              "src/app/snake-game/input.js",
-              "src/app/snake-game/snake.js"
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
             ]
           },
           "configurations": {
