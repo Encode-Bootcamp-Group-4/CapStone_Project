@@ -56,7 +56,7 @@ contract Game {
          "This function can only be accessed through game");
         require(player==playing,
         "Player is not currently playing");
-        if (_score == 0){
+        if (stats.highScore == 0){
             stats.highScore = _score;
             stats.currentWinner = player;
         } else if (_score > stats.highScore) {
@@ -80,8 +80,9 @@ contract Game {
     }
 
     /// @notice Withdraw `amount` from the owner pool
+    /// @notice We do not need to store a the total fees on chain as only one bet can be stored at a time and so all else is fees
     function ownerWithdraw(uint256 amount) public onlyOwner {
-        require(amount <= devStats.feesCollected,
+        require(amount <= address(this).balance-stats.betSize,
          "Not enough fees collected");
         devStats.feesCollected -= amount;
         payable(devStats.owner).transfer(amount);
