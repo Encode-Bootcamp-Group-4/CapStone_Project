@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-//still have to add the safemath library
 
 contract Game {
 
@@ -22,7 +21,6 @@ contract Game {
     struct devData {
         //fee for the contract holder as a percentage of the betSize in bps
         uint256 fee;   
-        uint256 feesCollected;
         address owner;
     }
 
@@ -51,24 +49,27 @@ contract Game {
     }
 
 
-    function saveScore(address player, uint16 _score) external {
+    function saveScore(address _player, uint16 _score) external {
+
         require(msg.sender == devStats.owner,
          "This function can only be accessed through game");
-        require(player==playing,
+        require( _player==playing,
         "Player is not currently playing");
+
         if (stats.highScore == 0){
             stats.highScore = _score;
-            stats.currentWinner = player;
+            stats.currentWinner = _player;
         } else if (_score > stats.highScore) {
             stats.highScore = _score;
-            stats.currentWinner = player;
+            stats.currentWinner = _player;
             prize[playing] += ( stats.betSize * ( 10000-devStats.fee ) ) / 10000;
         } else {
             prize[stats.currentWinner] += ( stats.betSize * ( 10000-devStats.fee ) ) / 10000;
         }
+
         playing = address(0);
         betsOpen = true;
-        emit logScore(player , _score, _score > stats.highScore);
+        emit logScore(_player , _score, _score > stats.highScore);
     }
 
     /// @notice Withdraw `amount` from that accounts prize pool
@@ -81,11 +82,10 @@ contract Game {
 
     /// @notice Withdraw `amount` from the owner pool
     /// @notice We do not need to store a the total fees on chain as only one bet can be stored at a time and so all else is fees
-    function ownerWithdraw(uint256 amount) public onlyOwner {
-        require(amount <= address(this).balance-stats.betSize,
+    function ownerWithdraw(uint256 _amount) public onlyOwner {
+        require( _amount <= address(this).balance-stats.betSize,
          "Not enough fees collected");
-        devStats.feesCollected -= amount;
-        payable(devStats.owner).transfer(amount);
+        payable(devStats.owner).transfer(_amount);
     }
 
     /// @notice Allows the devloper to view gamestats not available to others
