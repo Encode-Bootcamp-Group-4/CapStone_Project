@@ -43,6 +43,8 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
 
   get snakeSpeed() {
     const score = this.food.currentScore;
+    //return score;
+    console.log("Score: " + score);
     if(score < 10) return 4;
     if(score > 10 &&  score < 15 ) return 5;
     if(score > 15 && score < 20 ) return 6;
