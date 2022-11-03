@@ -3,7 +3,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 //still have to add the safemath library
 
-contract TokenizedBallot {
+contract Game {
 
     event gameBegin(address indexed _playing);
 
@@ -15,7 +15,7 @@ contract TokenizedBallot {
 
     struct gameData {
         uint256 betSize;
-        uint256 highScore;
+        uint16 highScore;
         address currentWinner;
     }
 
@@ -30,9 +30,6 @@ contract TokenizedBallot {
 
     devData private devStats;
 
-
-    //This really is unnecesserary, should jusy be done of chain
-    mapping (address => uint256) public score;
 
     mapping (address => uint256) public prize;
 
@@ -54,15 +51,17 @@ contract TokenizedBallot {
     }
 
 
-    function saveScore(address player, uint256 _score) external {
+    function saveScore(address player, uint16 _score) external {
         require(msg.sender == devStats.owner,
          "This function can only be accessed through game");
-        
         require(player==playing,
         "Player is not currently playing");
-        if (_score > stats.highScore) {
+        if (_score == 0){
             stats.highScore = _score;
-            score[playing] = _score;
+            stats.currentWinner = player;
+        } else if (_score > stats.highScore) {
+            stats.highScore = _score;
+            stats.currentWinner = player;
             prize[playing] += ( stats.betSize * ( 10000-devStats.fee ) ) / 10000;
         } else {
             prize[stats.currentWinner] += ( stats.betSize * ( 10000-devStats.fee ) ) / 10000;
@@ -74,22 +73,29 @@ contract TokenizedBallot {
 
     /// @notice Withdraw `amount` from that accounts prize pool
     function prizeWithdraw(uint256 amount) public {
-        require(amount <= prize[msg.sender], "Not enough prize");
+        require(amount <= prize[msg.sender],
+         "Not enough prize");
         prize[msg.sender] -= amount;
         payable(msg.sender).transfer(amount);
     }
 
     /// @notice Withdraw `amount` from the owner pool
-    function ownerWithdraw(uint256 amount) public {
-        require(amount <= devStats.feesCollected, "Not enough fees collected");
+    function ownerWithdraw(uint256 amount) public onlyOwner {
+        require(amount <= devStats.feesCollected,
+         "Not enough fees collected");
         devStats.feesCollected -= amount;
         payable(devStats.owner).transfer(amount);
     }
 
-    function viewDev() public view returns(devData memory) {
-        require(msg.sender == devStats.owner,
-         "Only Devs can view this data");
+    /// @notice Allows the devloper to view gamestats not available to others
+    function viewDev() public view onlyOwner returns(devData memory) {
         return devStats;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == devStats.owner,
+        "Only Devs can view this data");
+        _;
     }
         
 }
