@@ -1,6 +1,6 @@
 import { UserKeyInput } from "./input";
 
-export const SNAKE_SPEED = 7;
+export const SNAKE_SPEED = 1;
 
 export class Snake {
   snakeBody = [
