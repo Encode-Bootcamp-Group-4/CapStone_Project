@@ -3,27 +3,35 @@ pragma solidity >=0.7.0 <0.9.0;
 
 //import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
+//still have to add the safemath library
+
 contract TokenizedBallot {
 
-    event gameBegin(address indexed _from, bytes32 indexed _id, uint _value);
+    event gameBegin(address indexed _playing);
 
-    event Deposit(address indexed _from, bytes32 indexed _id, uint _value);
-
-    uint256 public betSize;
-    //check the actial relm of possible scores this size can probably be reduced
-    uint256 public highScore;
-    //fee for the contract holder as a percentage of the betSize in bps
-    uint256 private fee;
-    
-    uint256 private feesCollected;
-    //the address of the current winner
-    address public currentWinner;
-
-    address private owner;
+    event logScore(address indexed _playing, uint256 indexed _score, bool indexed _winning);
 
     address public playing;
 
     bool public betsOpen;
+
+    struct gameData {
+        uint256 betSize;
+        uint256 highScore;
+        address currentWinner;
+    }
+
+    struct devData {
+        //fee for the contract holder as a percentage of the betSize in bps
+        uint256 fee;   
+        uint256 feesCollected;
+        address owner;
+    }
+
+    gameData public stats;
+
+    devData private devStats;
+
 
     //This really is unnecesserary, should jusy be done of chain
     mapping (address => uint256) public score;
@@ -32,33 +40,38 @@ contract TokenizedBallot {
 
 
     constructor(uint256 _betSize, uint256 _fee) {
-        betSize = _betSize;
-        fee = _fee;
-        owner = msg.sender;
+        stats.betSize = _betSize;
+        devStats.fee = _fee;
+        devStats.owner = msg.sender;
         betsOpen=true;
     }
 
     function bet() public payable {
         require(betsOpen,"Bets are closed :(");
-        require(msg.value >= betSize, "Need to bet BIGGER!!!!!!!!");
+        require(msg.value >= stats.betSize, "Need to bet BIGGER!!!!!!!!");
         //close the betting
         betsOpen=false;
         playing=msg.sender;
+        emit gameBegin(msg.sender);
     }
 
 
-    function saveScore(uint256 _score) external {
-        require(msg.sender == owner,
+    function saveScore(address player, uint256 _score) external {
+        require(msg.sender == devStats.owner,
          "This function can only be accessed through game");
-        if (_score > highScore) {
-            highScore = _score;
+        
+        require(player==playing,
+        "Player is not currently playing");
+        if (_score > stats.highScore) {
+            stats.highScore = _score;
             score[playing] = _score;
-            prize[playing] += ( betSize * ( 10000-fee ) ) / 10000;
+            prize[playing] += ( stats.betSize * ( 10000-devStats.fee ) ) / 10000;
         } else {
-            prize[currentWinner] += ( betSize * ( 10000-fee ) ) / 10000;
+            prize[stats.currentWinner] += ( stats.betSize * ( 10000-devStats.fee ) ) / 10000;
         }
         playing = address(0);
         betsOpen = true;
+        emit logScore(player , _score, _score > stats.highScore);
     }
 
     /// @notice Withdraw `amount` from that accounts prize pool
@@ -70,9 +83,15 @@ contract TokenizedBallot {
 
     /// @notice Withdraw `amount` from the owner pool
     function ownerWithdraw(uint256 amount) public {
-        require(amount <= feesCollected, "Not enough fees collected");
-        feesCollected -= amount;
-        payable(owner).transfer(amount);
+        require(amount <= devStats.feesCollected, "Not enough fees collected");
+        devStats.feesCollected -= amount;
+        payable(devStats.owner).transfer(amount);
+    }
+
+    function viewDev() public view returns(devData memory) {
+        require(msg.sender == devStats.owner,
+         "Only Devs can view this data");
+        return devStats;
     }
         
 }
