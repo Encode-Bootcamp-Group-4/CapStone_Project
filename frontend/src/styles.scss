@@ -33,12 +33,17 @@
   }
   
   .snake {
-    background-image: url(./assets/Images/Duck_Resized.png);
+    background-image: url(./assets/Images/greenPattern2.png);
     transition: all .3ms ease-in;
   }
-  
+
+  .snakeHead {
+    background-image: url(./assets/Images/snakeHead2.png);
+    transition: all .3ms ease-in;
+  }
+
   .food {
-    background-image: url(./assets/Images/Potato_Resized.jpg);
+    background-image: url(./assets/Images/Duck2.png);
     transition: all .3ms ease-in;
   }
   
