@@ -43,3 +43,6 @@ Thumbs.db
 
 # Enviro variables
 .env
+
+#yarn
+yarn.lock

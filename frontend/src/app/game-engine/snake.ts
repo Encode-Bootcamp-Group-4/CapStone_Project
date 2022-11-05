@@ -1,10 +1,10 @@
 import { UserKeyInput } from "./input";
 
-export const SNAKE_SPEED = 7;
+export const SNAKE_SPEED = 1;
 
 export class Snake {
   snakeBody = [
-    { x: 11, y: 11 }
+    { x: 22, y: 22 }
   ];
 
   newSegments = 0
@@ -25,11 +25,17 @@ export class Snake {
   }
 
   draw(gameBoard: any) {
+    var snakeHead = true;
     this.snakeBody.forEach(segment => {
       const snakeElement = document.createElement('div');
       snakeElement.style.gridRowStart = segment.y.toString();
       snakeElement.style.gridColumnStart = segment.x.toString();
-      snakeElement.classList.add('snake');
+      if (snakeHead){
+        snakeElement.classList.add('snakeHead');
+        snakeHead = false;
+      }
+      else snakeElement.classList.add('snake');
+      //snakeElement.classList.add('snakeHead');
       gameBoard.appendChild(snakeElement);
     });
   }

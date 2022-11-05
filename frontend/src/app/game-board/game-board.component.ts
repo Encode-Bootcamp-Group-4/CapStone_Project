@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { type } from 'os';
 import { Food } from '../game-engine/food';
 import { outsideGrid } from '../game-engine/gameboard-grid.util';
 import { Snake } from '../game-engine/snake';
@@ -42,11 +43,16 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
 
 
   get snakeSpeed() {
-    const score = this.food.currentScore;
-    if(score < 10) return 4;
-    if(score > 10 &&  score < 15 ) return 5;
-    if(score > 15 && score < 20 ) return 6;
-    return 7;
+    let score = this.food.currentScore;
+    //return score;
+    console.log("Score: " + (score));
+    console.log("Score Stype: " + typeof(score));
+    console.log("Normal num type: " + typeof(15));
+    return score+10;
+    // if(score < 10) return 4;
+    // if(score > 10 &&  score < 15 ) return 5;
+    // if(score > 15 && score < 20 ) return 6;
+    // return 7;
   }
 
   dpadMovement(direction: string) {
