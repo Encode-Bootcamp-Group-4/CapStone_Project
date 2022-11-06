@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { ethers } from "ethers";
 import GameJSON from "../assets/Game.sol/Game.json";
 
-const GAME_ADDRESS = "";
+const GAME_ADDRESS = "0x8bb90cf33a12cc2bb573705cabf66444ce99cc14";
 const GAME_ABI = GameJSON.abi;
 
 @Injectable()
