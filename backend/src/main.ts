@@ -17,10 +17,10 @@ async function bootstrap() {
   app.enableCors(corsOptions);
 
   const config = new DocumentBuilder()
-  .setTitle('Week 4 Team 4 Encode')
-  .setDescription('API description for Week 4 Team 4 Encode')
+  .setTitle('Capstone Team 4 Encode')
+  .setDescription('API description for Capstone Team 4 Encode')
   .setVersion('1.0')
-  .addTag('week-4')
+  .addTag('Capstone Project')
   .build(); 
 
   const document = SwaggerModule.createDocument(app, config);
