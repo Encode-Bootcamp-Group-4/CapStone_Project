@@ -17,7 +17,7 @@ async function bootstrap() {
   app.enableCors(corsOptions);
 
   const config = new DocumentBuilder()
-  .setTitle('Capstone Team 4 Encode')
+  .setTitle('Capstone Team 4 Encode Bootcamp')
   .setDescription('API description for Capstone Team 4 Encode')
   .setVersion('1.0')
   .addTag('Capstone Project')
