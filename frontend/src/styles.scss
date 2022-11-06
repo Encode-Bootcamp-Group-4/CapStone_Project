@@ -6,7 +6,7 @@
   
   :root {
     --background-color: #282846;
-    --board-color: #d8ebe4;
+    --board-color: #a7f3b7;
     --snake-color: #fed049;
     --food-color: #007580;
   
@@ -34,16 +34,19 @@
   
   .snake {
     background-image: url(./assets/Images/greenPattern2.png);
+    background-repeat: no-repeat;
     transition: all .3ms ease-in;
   }
 
   .snakeHead {
     background-image: url(./assets/Images/snakeHead2.png);
+    background-repeat: no-repeat;
     transition: all .3ms ease-in;
   }
 
   .food {
     background-image: url(./assets/Images/Duck2.png);
+    background-repeat: no-repeat;
     transition: all .3ms ease-in;
   }
   
