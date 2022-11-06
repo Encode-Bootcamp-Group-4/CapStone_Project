@@ -27,7 +27,7 @@ contract Game is Ownable {
     mapping(uint256 => gameStruct) public games;
 
     // open game event
-    event OpenGame(uint256 gameId, uint256 betSize, address addressSetter);
+    event OpenGame(uint256 gameId, uint256 betSize, uint16 score);
 
     // close game event
     event CloseChallenge(uint256 gameId, uint16 score, address addressChallenger);
@@ -67,7 +67,7 @@ contract Game is Ownable {
         );
         require(games[_gameId].score == 0, "Score already set!");
         games[_gameId].score = _score;
-        emit OpenGame(_gameId, games[_gameId].score, games[_gameId].addressSetter);
+        emit OpenGame(_gameId, games[_gameId].betSize, games[_gameId].score);
     }
 
     // challenge an existing game
