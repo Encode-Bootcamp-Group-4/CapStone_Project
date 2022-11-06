@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { ethers } from "ethers";
-import GameJSON from "../assets/Game.sol/Game.json";
+import * as GameJSON from "./assets/Game.json";
 
 const GAME_ADDRESS = "0x8bb90cf33a12cc2bb573705cabf66444ce99cc14";
-const GAME_ABI = GameJSON.abi;
+const GAME_ABI = GameJSON.abi; // Game contract ABI
+require("dotenv").config()
 
 @Injectable()
 export class AppService {
