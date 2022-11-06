@@ -35,8 +35,7 @@ async function main() {
 
     // Step 4: Deploy contract
     main = await mainFactory.deploy(
-        ethers.utils.parseUnits(String(0.1),"ether"), // 0.01 ETH
-        5 // 0.005 ETH (5%)
+        ethers.utils.parseEther("0.01"),
     );
     const deployment = await main.deployed();
     console.log("Contract address: ", deployment.address);
