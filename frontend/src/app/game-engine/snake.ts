@@ -22,9 +22,11 @@ export class Snake {
     }
     this.snakeBody[0].x += inputDirection.x;
     this.snakeBody[0].y += inputDirection.y;
+
   }
 
   draw(gameBoard: any) {
+    console.log(gameBoard);
     var snakeHead = true;
     this.snakeBody.forEach(segment => {
       const snakeElement = document.createElement('div');

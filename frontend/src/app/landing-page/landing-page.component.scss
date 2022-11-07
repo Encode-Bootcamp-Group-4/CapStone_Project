@@ -1,0 +1,39 @@
+.py-5, .text-center, .container {
+    background: url('../../assets/Images/greenPattern.jpg');
+}
+
+#topPart {
+    // Makes everything blurred...
+    // background: url('../../assets/Images/greenPattern.jpg');
+    // filter: blur(8px);
+    // -webkit-filter: blur(8px);
+
+    background: #D2FCFF
+}
+
+#topPart > #topPartContent {
+    //background: url('../../assets/Images/greenPattern.jpg');
+    filter: blur(0px);
+    -webkit-filter: blur(0px);
+}
+
+#PostNewGameButton {
+    margin-right: 5px;
+
+    background-color: #009100;
+    border: #009100;
+
+    transition-duration: 0.2s;
+}
+
+#PostNewGameButton:hover {
+    margin-right: 5px;
+
+    background-color: #006e00;
+    border: #006e00;
+    
+}
+
+
+// Suposedely makes white part also light blue, on top of page. Not working tho?
+html {background-color: #D2FCFF}
