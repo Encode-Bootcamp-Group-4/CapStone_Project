@@ -1,8 +1,12 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { type } from 'os';
 import { Food } from '../game-engine/food';
 import { outsideGrid } from '../game-engine/gameboard-grid.util';
 import { Snake } from '../game-engine/snake';
+import { WalletService } from '../services/wallet.service';
+import { ethers } from 'ethers';
+import { GAME_ADDRESS } from '../vars/contractAddress';
+import { ApiService } from '../api.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-game-board',
@@ -17,17 +21,47 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
   SNAKE_SPEED = 1;
   snake = new Snake();
   food = new Food(this.snake);
-  constructor() { }
+  walletId: string = '';
+  provider: any;
+  signer: any;
+  user: any;
+  gameId: any;
+  public ethereum;
+
+  constructor(private walletService: WalletService, private apiService: ApiService, private router: Router) { 
+    this.ethereum = (window as any).ethereum;
+    this.provider = new ethers.providers.Web3Provider(this.ethereum);
+    this.signer = this.provider.getSigner();
+    this.user = this.signer.getAddress();
+  }
 
   ngOnInit(): void {
+    this.apiService.setGameScore
+    this.walletService
+    .checkWalletConnected()
+    .then((accounts) => (this.walletId = accounts[0]));
     this.snake.listenToInputs();
+    let etherscanProvider = new ethers.providers.EtherscanProvider(
+      5,
+      "5J4HFGNWQQN49RI7JMWWYDAJ5ZV6VAQ6M9"
+    );
+    etherscanProvider.getHistory(GAME_ADDRESS).then((history) => {
+      // console.log(history);
+      this.gameId = history.filter(tx => {
+        if (tx.data == '0x7255d729' ) {
+          return true;
+        }
+        return false;
+      }).length;
+      console.log(this.gameId);
+    }
+    );
   }
 
   ngAfterViewInit(){
     this.gameBoard = document.querySelector('.game-board');
     window.requestAnimationFrame(this.start.bind(this));
   }
-
 
   start(currentTime: any) {
     if(this.gameOver) return console.log('Game Over');
@@ -41,13 +75,12 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
     this.draw();
   }
 
-
   get snakeSpeed() {
     let score = this.food.currentScore;
     //return score;
-    console.log("Score: " + (score));
-    console.log("Score Stype: " + typeof(score));
-    console.log("Normal num type: " + typeof(15));
+    // console.log("Score: " + (score));
+    // console.log("Score Stype: " + typeof(score));
+    // console.log("Normal num type: " + typeof(15));
     return score+10;
     // if(score < 10) return 4;
     // if(score > 10 &&  score < 15 ) return 5;
@@ -77,8 +110,18 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
     this.gameBoard.classList.add("blur");
   }
 
-  restart() {
-    window.location.reload();
+  async submitScore() {
+    console.log("Submitting score");
+    // console.log("GameId: " + this.gameId);
+    // console.log("Score: " + this.food.currentScore);
+    let user = await this.signer.getAddress();
+    // console.log("User: " + user);
+    this.apiService.setGameScore(this.gameId, this.food.currentScore, user).subscribe((response) => {
+      console.log(response);
+    });
+    console.log("Score submitted");
+    window.alert("You have submitted your score and should appear in the game catalog soon!")
+    this.router.navigate(['/landing-page']);
   }
 
 }
