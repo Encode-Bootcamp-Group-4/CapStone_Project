@@ -2,12 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { WalletService } from '../services/wallet.service';
 import { ethers } from 'ethers';
+import web3 from 'web3';
 import { GAME_ADDRESS } from '../vars/contractAddress';
 import { GAME_ABI } from '../vars/contractABI';
 import { Router } from '@angular/router';
 
 const gameContract = GAME_ADDRESS;
 const gameABI = GAME_ABI;
+const iface = new ethers.utils.Interface(gameABI);
 
 @Component({
   selector: 'app-landing-page',
@@ -22,6 +24,7 @@ export class LandingPageComponent implements OnInit {
   gameContract: any;
   gameABI: any;
   gameCatalog: any;
+  gameDataArr: any;
   public ethereum
 
   constructor(private router: Router, private walletService: WalletService) {
@@ -39,22 +42,25 @@ export class LandingPageComponent implements OnInit {
       5,
       "5J4HFGNWQQN49RI7JMWWYDAJ5ZV6VAQ6M9"
     );
-    etherscanProvider.getHistory(gameContract).then((history) => {
-      // console.log(history);
-      // this.gameCatalog = history.filter(tx => {
-      //   if (tx.data.slice(0,10) == '0x78c02daa' ) {
-      //     return true;
-      //   }
-      //   return false;
-      // });
-      // console.log(this.gameCatalog);
-    }
-    );
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
+    console.log(game.filters.OpenGame().topics);
+    let topic = game.filters.OpenGame().topics ? null;
+    // let topic = ethers.utils.id("SetGameScore(uint256, uint16, address)");
+    let filter = {
+      address: gameContract,
+      fromBlock: 7905426 - 10,
+      toBlock:  7907307 + 10, 
+      topics: [ topic[0] ]
+    };
+    etherscanProvider.getLogs(filter).then((result) => {
+      console.log(result);
+    });
+    
   }
 
   _bet = new FormControl("0.01");
   async submitGame(bet: any) {
-    const game = new ethers.Contract(gameContract, gameABI.abi, this.signer);
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
     const options = {value: ethers.utils.parseEther(bet)};
     const createGameTx = await game['createGame'](options);
     await createGameTx.wait();
