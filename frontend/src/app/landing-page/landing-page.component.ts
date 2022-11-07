@@ -21,6 +21,7 @@ export class LandingPageComponent implements OnInit {
   user: any;
   gameContract: any;
   gameABI: any;
+  gameCatalog: any;
   public ethereum
 
   constructor(private router: Router, private walletService: WalletService) {
@@ -34,6 +35,21 @@ export class LandingPageComponent implements OnInit {
     this.walletService
     .checkWalletConnected()
     .then((accounts) => (this.walletId = accounts[0]));
+    let etherscanProvider = new ethers.providers.EtherscanProvider(
+      5,
+      "5J4HFGNWQQN49RI7JMWWYDAJ5ZV6VAQ6M9"
+    );
+    etherscanProvider.getHistory(gameContract).then((history) => {
+      // console.log(history);
+      // this.gameCatalog = history.filter(tx => {
+      //   if (tx.data.slice(0,10) == '0x78c02daa' ) {
+      //     return true;
+      //   }
+      //   return false;
+      // });
+      // console.log(this.gameCatalog);
+    }
+    );
   }
 
   _bet = new FormControl("0.01");
