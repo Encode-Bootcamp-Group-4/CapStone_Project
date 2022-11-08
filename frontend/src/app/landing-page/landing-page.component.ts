@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { WalletService } from '../services/wallet.service';
-import { ethers } from 'ethers';
-import web3 from 'web3';
+import { ethers} from 'ethers';
 import { GAME_ADDRESS } from '../vars/contractAddress';
 import { GAME_ABI } from '../vars/contractABI';
 import { Router } from '@angular/router';
@@ -21,10 +20,12 @@ export class LandingPageComponent implements OnInit {
   provider: any;
   signer: any;
   user: any;
+  game: any;
   gameContract: any;
   gameABI: any;
   gameCatalog: any;
   gameDataArr: any;
+  topic: any;
   public ethereum
 
   constructor(private router: Router, private walletService: WalletService) {
@@ -43,17 +44,19 @@ export class LandingPageComponent implements OnInit {
       "5J4HFGNWQQN49RI7JMWWYDAJ5ZV6VAQ6M9"
     );
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
-    console.log(game.filters.OpenGame().topics);
-    let topic = game.filters.OpenGame().topics ? null;
-    // let topic = ethers.utils.id("SetGameScore(uint256, uint16, address)");
+    this.topic = game.filters.OpenGame().topics;
+    // console.log(topic);
     let filter = {
       address: gameContract,
-      fromBlock: 7905426 - 10,
-      toBlock:  7907307 + 10, 
-      topics: [ topic[0] ]
+      topics: [this.topic[0]],
     };
     etherscanProvider.getLogs(filter).then((result) => {
-      console.log(result);
+      this.gameCatalog = result;
+      this.gameDataArr = this.gameCatalog.map((game: { topics: string[]; data: string; }) => {
+        const parsed = iface.parseLog(game);
+        return parsed.args;
+      });
+      console.log(this.gameDataArr);
     });
     
   }
@@ -66,5 +69,15 @@ export class LandingPageComponent implements OnInit {
     await createGameTx.wait();
     this.router.navigate(['/game-board']);
   };
+
+  async challengeGame(gameId: any, bet: any) {
+    console.log(gameId);
+    console.log(bet);
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
+    const options = {value: bet};
+    const challengeGameTx = await game['startChallenge'](gameId, options);
+    await challengeGameTx.wait();
+    this.router.navigate(['/game-board-challenge'], { queryParams: { id: gameId } });
+  }
 
 }

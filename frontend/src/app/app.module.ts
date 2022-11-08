@@ -8,6 +8,7 @@ import { AppComponent } from './app.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
 import { WalletConnectComponent } from './wallet-connect/wallet-connect.component';
 import { GameBoardComponent } from './game-board/game-board.component';
+import { GameBoardChallengeComponent } from './game-board-challenge/game-board-challenge.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { GameBoardComponent } from './game-board/game-board.component';
     LandingPageComponent,
     WalletConnectComponent,
     GameBoardComponent,
+    GameBoardChallengeComponent,
   ],
   imports: [
     BrowserModule,
