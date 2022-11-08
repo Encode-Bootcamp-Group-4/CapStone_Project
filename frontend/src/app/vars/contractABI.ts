@@ -21,6 +21,12 @@ export const GAME_ABI = [
 			},
 			{
 				"indexed": false,
+				"internalType": "uint256",
+				"name": "betSize",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint16",
 				"name": "score",
 				"type": "uint16"
@@ -55,6 +61,12 @@ export const GAME_ABI = [
 				"internalType": "uint16",
 				"name": "score",
 				"type": "uint16"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "addressSetter",
+				"type": "address"
 			}
 		],
 		"name": "OpenGame",
@@ -220,6 +232,19 @@ export const GAME_ABI = [
 				"type": "uint256"
 			}
 		],
+		"name": "ownerWithdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_amount",
+				"type": "uint256"
+			}
+		],
 		"name": "prizeWithdraw",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -281,5 +306,5 @@ export const GAME_ABI = [
 		"stateMutability": "nonpayable",
 		"type": "function"
 	}
-]
+];
     
