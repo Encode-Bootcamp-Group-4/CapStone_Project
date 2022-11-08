@@ -124,43 +124,20 @@
                   <thead>
                     <tr>
                         <th scope="col">Game Id</th>
-                        <th scope="col">Bet Size</th>
+                        <th scope="col">Bet Size (WEI)</th>
                         <th scope="col">Score</th>
                         <th scope="col">Button</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Placeholders -->
-                    <tr>
-                        <td>1</td>
-                        <td>0.01 ETH</td>
-                        <td>10</td>
+                    <tr *ngFor="let game of gameDataArr">
+                        <td>{{game.gameId}}</td>
+                        <td>{{game.betSize}}</td>
+                        <td>{{game.score}}</td>
                         <td>
-                            <a href="/landing-page" class="btn btn-primary my-2">CHALLENGE</a>
+                            <button class="btn btn-primary my-2" (click)="challengeGame(game.gameId, game.betSize)">CHALLENGE</button>
                         </td>
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>0.05 ETH</td>
-                        <td>5</td>
-                        <td>
-                            <a href="/landing-page" class="btn btn-primary my-2">CHALLENGE</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>0.02 ETH</td>
-                        <td>40</td>
-                        <td>
-                            <a href="/landing-page" class="btn btn-primary my-2">CHALLENGE</a>
-                        </td>
-                    </tr>
-                    <!-- Use below code to map through open games -->
-                    <!-- <tr *ngFor="let vote of voteArr">
-                      <td>{{vote.hash}}</td>
-                      <td>{{vote.data}}</td>
-                      <td>{{vote.from}}</td>
-                    </tr> -->
                   </tbody>
                 </table>
               </div>

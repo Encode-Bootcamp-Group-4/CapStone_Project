@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { WalletService } from '../services/wallet.service';
-import { ethers } from 'ethers';
+import { ethers} from 'ethers';
 import { GAME_ADDRESS } from '../vars/contractAddress';
 import { GAME_ABI } from '../vars/contractABI';
 import { Router } from '@angular/router';
 
 const gameContract = GAME_ADDRESS;
 const gameABI = GAME_ABI;
+const iface = new ethers.utils.Interface(gameABI);
 
 @Component({
   selector: 'app-landing-page',
@@ -19,9 +20,12 @@ export class LandingPageComponent implements OnInit {
   provider: any;
   signer: any;
   user: any;
+  game: any;
   gameContract: any;
   gameABI: any;
   gameCatalog: any;
+  gameDataArr: any;
+  topic: any;
   public ethereum
 
   constructor(private router: Router, private walletService: WalletService) {
@@ -39,26 +43,41 @@ export class LandingPageComponent implements OnInit {
       5,
       "5J4HFGNWQQN49RI7JMWWYDAJ5ZV6VAQ6M9"
     );
-    etherscanProvider.getHistory(gameContract).then((history) => {
-      // console.log(history);
-      // this.gameCatalog = history.filter(tx => {
-      //   if (tx.data.slice(0,10) == '0x78c02daa' ) {
-      //     return true;
-      //   }
-      //   return false;
-      // });
-      // console.log(this.gameCatalog);
-    }
-    );
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
+    this.topic = game.filters.OpenGame().topics;
+    // console.log(topic);
+    let filter = {
+      address: gameContract,
+      topics: [this.topic[0]],
+    };
+    etherscanProvider.getLogs(filter).then((result) => {
+      this.gameCatalog = result;
+      this.gameDataArr = this.gameCatalog.map((game: { topics: string[]; data: string; }) => {
+        const parsed = iface.parseLog(game);
+        return parsed.args;
+      });
+      console.log(this.gameDataArr);
+    });
+    
   }
 
   _bet = new FormControl("0.01");
   async submitGame(bet: any) {
-    const game = new ethers.Contract(gameContract, gameABI.abi, this.signer);
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
     const options = {value: ethers.utils.parseEther(bet)};
     const createGameTx = await game['createGame'](options);
     await createGameTx.wait();
     this.router.navigate(['/game-board']);
   };
+
+  async challengeGame(gameId: any, bet: any) {
+    console.log(gameId);
+    console.log(bet);
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
+    const options = {value: bet};
+    const challengeGameTx = await game['startChallenge'](gameId, options);
+    await challengeGameTx.wait();
+    this.router.navigate(['/game-board-challenge'], { queryParams: { id: gameId } });
+  }
 
 }
