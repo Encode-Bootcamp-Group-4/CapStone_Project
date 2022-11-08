@@ -52,7 +52,6 @@ export class Snake {
     return this.onSnake(this.snakeBody[0], { ignoreHead: true });
   }
 
-
   onSnake(position: any, { ignoreHead = false } = {}) {
     return this.snakeBody.some((segment, index) => {
       if (ignoreHead && index === 0) return false;

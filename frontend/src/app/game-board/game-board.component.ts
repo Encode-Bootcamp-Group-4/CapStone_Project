@@ -77,15 +77,7 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
 
   get snakeSpeed() {
     let score = this.food.currentScore;
-    //return score;
-    // console.log("Score: " + (score));
-    // console.log("Score Stype: " + typeof(score));
-    // console.log("Normal num type: " + typeof(15));
     return score+10;
-    // if(score < 10) return 4;
-    // if(score > 10 &&  score < 15 ) return 5;
-    // if(score > 15 && score < 20 ) return 6;
-    // return 7;
   }
 
   dpadMovement(direction: string) {
@@ -117,10 +109,10 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
     let user = await this.signer.getAddress();
     // console.log("User: " + user);
     this.apiService.setGameScore(this.gameId, this.food.currentScore, user).subscribe((response) => {
-      console.log(response);
+      // console.log(response);
     });
     console.log("Score submitted");
-    window.alert("You have submitted your score and should appear in the game catalog soon!")
+    window.alert("You have submitted your score and should appear in the game catalog soon (~1-2 mins.)!")
     this.router.navigate(['/landing-page']);
   }
 

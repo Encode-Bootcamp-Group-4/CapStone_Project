@@ -26,7 +26,6 @@ export class Food {
     gameBoard.appendChild(foodElement);
   }
 
-
   getRandomFoodPosition() {
     let newFoodPosition;
     while (newFoodPosition == null || this.snake.onSnake(newFoodPosition)) {
