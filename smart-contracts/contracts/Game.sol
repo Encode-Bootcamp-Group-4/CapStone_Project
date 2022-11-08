@@ -5,39 +5,41 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract Game is Ownable {
     
+    // Contract variables
     uint256 public minBet;
     address public ownerAddress;
 
-    // to store balances in contract
+    // To store balances in contract
     mapping(address => uint256) public balances;
 
-    // for game id counters
+    // Using Counters library to keep track of the number of games
     using Counters for Counters.Counter;
     Counters.Counter private _gameIds;
 
+    // To store the game details
     struct gameStruct {
         uint256 gameId;
         uint256 betSize;
         uint16 score;
         address addressSetter;
-        address addressChallenger; // is the game being challenged right now?
+        address addressChallenger; // set as null, if no challenger
     }
 
-    // to store active games in contract
+    // To store active games in contract
     mapping(uint256 => gameStruct) public games;
 
-    // open game event
-    event OpenGame(uint256 gameId, uint256 betSize, uint16 score);
+    // Open game event (emitted when score is set, called by backend api)
+    event OpenGame(uint256 gameId, uint256 betSize, uint16 score, address addressSetter);
 
-    // close game event
-    event CloseChallenge(uint256 gameId, uint16 score, address addressChallenger);
+    // Close game event (emitted when score is set, called by backend api)
+    event CloseChallenge(uint256 gameId, uint256 betSize, uint16 score, address addressChallenger);
 
     constructor(uint256 _minBet) {
         minBet = _minBet;
         ownerAddress = msg.sender;
     }
 
-    // create a game
+    ///@notice open a game
     function createGame() public payable returns (uint256) {
         require(msg.value >= minBet, "need to bet some more money my friend, minimum bet is 0.01 ether");
 
@@ -54,7 +56,7 @@ contract Game is Ownable {
         return newGameId;
     }
 
-    // set the game score for a created game. backend function
+    ///@notice set the game score. Call from the backend api.
     function setGameScore(
         uint256 _gameId,
         uint16 _score,
@@ -67,10 +69,10 @@ contract Game is Ownable {
         );
         require(games[_gameId].score == 0, "Score already set!");
         games[_gameId].score = _score;
-        emit OpenGame(_gameId, games[_gameId].betSize, games[_gameId].score);
+        emit OpenGame(_gameId, games[_gameId].betSize, games[_gameId].score, games[_gameId].addressSetter);
     }
 
-    // challenge an existing game
+    /// @notice challenge a game
     function startChallenge(uint256 _gameId) public payable {
         gameStruct memory _game = games[_gameId];
         require(
@@ -87,7 +89,7 @@ contract Game is Ownable {
         games[_gameId].addressChallenger = msg.sender;
     }
 
-    // close off the challenge. backend function
+    /// @notice close the challenge. Call from the backend api.
     function closeChallenge(
         uint256 _gameId,
         uint16 _score,
@@ -113,10 +115,10 @@ contract Game is Ownable {
             games[_gameId]
                 .addressChallenger = 0x0000000000000000000000000000000000000000;
         }
-        emit CloseChallenge(_gameId, games[_gameId].score, games[_gameId].addressChallenger);
+        emit CloseChallenge(_gameId, games[_gameId].betSize, games[_gameId].score, games[_gameId].addressChallenger);
     }
 
-    /// @notice Withdraw `amount` from that accounts prize pool
+    /// @notice withdraw `amount` from that accounts prize pool
     function prizeWithdraw(uint256 _amount) public {
         require(_amount <= balances[msg.sender], "Not enough balance");
         balances[msg.sender] -= _amount;
@@ -124,5 +126,12 @@ contract Game is Ownable {
         payable(msg.sender).transfer((_amount * 19) / 20);
         // our fee - 5% at extraction
         payable(ownerAddress).transfer(_amount / 20);
+    }
+
+    /// @notice withdraw `amount` from te contract's owner prize pool
+    function ownerWithdraw(uint256 _amount) public {
+        require(msg.sender == ownerAddress, "onlyOwner!");
+        require(_amount <= balances[ownerAddress], "Not enough balance");
+        payable(ownerAddress).transfer(_amount);
     }
 }
