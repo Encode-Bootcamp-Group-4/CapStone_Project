@@ -1,10 +1,9 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Food } from '../game-engine/food';
 import { outsideGrid } from '../game-engine/gameboard-grid.util';
 import { Snake } from '../game-engine/snake';
 import { WalletService } from '../services/wallet.service';
 import { ethers } from 'ethers';
-import { GAME_ADDRESS } from '../vars/contractAddress';
 import { ApiService } from '../api.service';
 import { ActivatedRoute, Router} from '@angular/router';
 
@@ -45,7 +44,7 @@ export class GameBoardChallengeComponent implements OnInit {
       .subscribe((params => {
         // console.log(params);
         this.gameId = params.id;
-        console.log(this.gameId);
+        // console.log(this.gameId);
       }
     ));
   }
@@ -72,15 +71,7 @@ export class GameBoardChallengeComponent implements OnInit {
 
   get snakeSpeed() {
     let score = this.food.currentScore;
-    //return score;
-    // console.log("Score: " + (score));
-    // console.log("Score Stype: " + typeof(score));
-    // console.log("Normal num type: " + typeof(15));
     return score+10;
-    // if(score < 10) return 4;
-    // if(score > 10 &&  score < 15 ) return 5;
-    // if(score > 15 && score < 20 ) return 6;
-    // return 7;
   }
 
   dpadMovement(direction: string) {
@@ -107,15 +98,15 @@ export class GameBoardChallengeComponent implements OnInit {
 
   async closeChallenge() {
     console.log("Closing challenge");
-    console.log("GameId: " + this.gameId);
-    console.log("Score: " + this.food.currentScore);
+    // console.log("GameId: " + this.gameId);
+    // console.log("Score: " + this.food.currentScore);
     let user = await this.signer.getAddress();
-    console.log("User: " + user);
+    // console.log("User: " + user);
     this.apiService.closeChallenge(this.gameId, this.food.currentScore, user).subscribe((res) => {
       console.log(res);
     });
     console.log("Challenge closed");
-    window.alert("Challenge closed");
+    window.alert("Challenge is now closed.");
     this.router.navigate(['/landing-page']);
   }
 }

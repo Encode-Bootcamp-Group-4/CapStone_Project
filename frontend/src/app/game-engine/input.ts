@@ -2,7 +2,6 @@ export class UserKeyInput {
   inputDirection = { x: 0, y: 0 };
   lastInputDirection = { x: 0, y: 0 };
 
-
   getInputs() {
     window.addEventListener('keydown', e => {
       this.setDirection(e.key);

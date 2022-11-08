@@ -56,13 +56,14 @@ export class LandingPageComponent implements OnInit {
         const parsed = iface.parseLog(game);
         return parsed.args;
       });
-      console.log(this.gameDataArr);
+      // console.log(this.gameDataArr);
     });
     
   }
 
   _bet = new FormControl("0.01");
   async submitGame(bet: any) {
+    // console.log(bet);
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
     const options = {value: ethers.utils.parseEther(bet)};
     const createGameTx = await game['createGame'](options);
@@ -71,13 +72,22 @@ export class LandingPageComponent implements OnInit {
   };
 
   async challengeGame(gameId: any, bet: any) {
-    console.log(gameId);
-    console.log(bet);
+    // console.log(gameId);
+    // console.log(bet);
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
     const options = {value: bet};
     const challengeGameTx = await game['startChallenge'](gameId, options);
     await challengeGameTx.wait();
     this.router.navigate(['/game-board-challenge'], { queryParams: { id: gameId } });
+  }
+
+  async withdrawWinnings() {
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
+    const amount = await game['balances'](this.user);
+    // console.log(amount);
+    const withdrawWinningsTx = await game['prizeWithdraw'](amount);
+    await withdrawWinningsTx.wait();
+    window.alert(`You have withdrawn your winnings! ${amount} WEI should appear in your wallet shortly.`);
   }
 
 }
