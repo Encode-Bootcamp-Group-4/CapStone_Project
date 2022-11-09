@@ -5,16 +5,16 @@ import { Snake } from '../game-engine/snake';
 import { WalletService } from '../services/wallet.service';
 import { ethers } from 'ethers';
 import { ApiService } from '../api.service';
-import { ActivatedRoute, Router} from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-game-board-challenge',
   templateUrl: './game-board-challenge.component.html',
-  styleUrls: ['./game-board-challenge.component.scss']
+  styleUrls: ['./game-board-challenge.component.scss'],
 })
 export class GameBoardChallengeComponent implements OnInit {
-  lastRenderTime = 0
-  gameOver = false
+  lastRenderTime = 0;
+  gameOver = false;
   gameBoard: any;
   SNAKE_SPEED = 1;
   snake = new Snake();
@@ -27,7 +27,12 @@ export class GameBoardChallengeComponent implements OnInit {
   public ethereum;
   id: any;
 
-  constructor(private walletService: WalletService, private apiService: ApiService, private route: ActivatedRoute, private router: Router) { 
+  constructor(
+    private walletService: WalletService,
+    private apiService: ApiService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.ethereum = (window as any).ethereum;
     this.provider = new ethers.providers.Web3Provider(this.ethereum);
     this.signer = this.provider.getSigner();
@@ -35,27 +40,25 @@ export class GameBoardChallengeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.apiService.closeChallenge
+    this.apiService.closeChallenge;
     this.walletService
-    .checkWalletConnected()
-    .then((accounts) => (this.walletId = accounts[0]));
+      .checkWalletConnected()
+      .then((accounts) => (this.walletId = accounts[0]));
     this.snake.listenToInputs();
-    this.route.queryParams
-      .subscribe((params => {
-        // console.log(params);
-        this.gameId = params.id;
-        // console.log(this.gameId);
-      }
-    ));
+    this.route.queryParams.subscribe((params) => {
+      // console.log(params);
+      this.gameId = params.id;
+      // console.log(this.gameId);
+    });
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     this.gameBoard = document.querySelector('.game-board');
     window.requestAnimationFrame(this.start.bind(this));
   }
 
   start(currentTime: any) {
-    if(this.gameOver) {
+    if (this.gameOver) {
       this.closeChallenge();
       return console.log('Game Over');
     }
@@ -71,7 +74,7 @@ export class GameBoardChallengeComponent implements OnInit {
 
   get snakeSpeed() {
     let score = this.food.currentScore;
-    return score+10;
+    return score + 10;
   }
 
   dpadMovement(direction: string) {
@@ -91,22 +94,25 @@ export class GameBoardChallengeComponent implements OnInit {
   }
 
   checkDeath() {
-    this.gameOver = outsideGrid(this.snake.getSnakeHead()) || this.snake.snakeIntersection();
-    if(!this.gameOver) return;
-    this.gameBoard.classList.add("blur");
+    this.gameOver =
+      outsideGrid(this.snake.getSnakeHead()) || this.snake.snakeIntersection();
+    if (!this.gameOver) return;
+    this.gameBoard.classList.add('blur');
   }
 
   async closeChallenge() {
-    console.log("Closing challenge");
+    console.log('Closing challenge');
     // console.log("GameId: " + this.gameId);
     // console.log("Score: " + this.food.currentScore);
     let user = await this.signer.getAddress();
     // console.log("User: " + user);
-    this.apiService.closeChallenge(this.gameId, this.food.currentScore, user).subscribe((res) => {
-      console.log(res);
-    });
-    console.log("Challenge closed");
-    window.alert("Challenge is now closed.");
+    this.apiService
+      .closeChallenge(this.gameId, this.food.currentScore, user)
+      .subscribe((res) => {
+        console.log(res);
+      });
+    console.log('Challenge closed');
+    window.alert('Challenge is now closed.');
     this.router.navigate(['/landing-page']);
   }
 }
