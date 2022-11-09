@@ -88,9 +88,18 @@ export class LandingPageComponent implements OnInit {
     const options = { value: bet };
     const challengeGameTx = await game['startChallenge'](gameId, options);
     await challengeGameTx.wait();
+    window.alert("You have challenged the game! Please DON'T REFRESH the page. You will be redirected to the game board shortly.");
     this.router.navigate(['/game-board-challenge'], {
       queryParams: { id: gameId },
     });
+  }
+
+  async checkBalance() {
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
+    const amount = await game['balances'](this.user);
+    window.alert(
+      `You have ${amount/1000000000000000000} ETH in winnings! Click button below to withdraw!`
+    );
   }
 
   async withdrawWinnings() {
