@@ -6,6 +6,22 @@
     user-select: none;
 }
 
+button {
+    transition: transform .13s;
+}
+
+button:hover {
+    transform: scale(1.08);
+}
+
+main{
+    background-image: url("../../assets/Images/snakeblur3.png");
+}
+
+#openGames {
+    background-image: url("../../assets/Images/snakeskinblur3.png");
+}
+
 @media (min-width: 768px) {
     .bd-placeholder-img-lg {
     font-size: 3.5rem;

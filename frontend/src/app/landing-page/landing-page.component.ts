@@ -91,7 +91,7 @@ export class LandingPageComponent implements OnInit {
     const withdrawWinningsTx = await game['prizeWithdraw'](amount);
     await withdrawWinningsTx.wait();
     window.alert(
-      `You have withdrawn your winnings! ${amount} WEI should appear in your wallet shortly.`
+      `You have withdrawn your winnings! ${amount/1000000000000000000} ETH should appear in your wallet shortly.`
     );
   }
 

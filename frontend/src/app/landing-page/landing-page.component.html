@@ -34,7 +34,7 @@
     </header>
 
     <main>
-    
+    <div class="backgroundImage"></div>
     <!-- Title and Rules section (Edit modal for game rules) -->
     <section class="py-5 text-center container">
         <div class="row py-lg-5">
@@ -63,7 +63,7 @@
     </section>
 
     <!-- Game catalog section -->
-    <div class="album py-5 bg-light">
+    <div class="album py-5 bg-light" id="openGames">
         <div class="py-5 text-center container">
             <h2 class="text-center">GAME CATALOG</h2>
             <div class="table-responsive">
@@ -71,7 +71,7 @@
                   <thead>
                     <tr>
                         <th scope="col">Game Id</th>
-                        <th scope="col">Bet Size (WEI)</th>
+                        <th scope="col">Bet Size (ETH)</th>
                         <th scope="col">Score</th>
                         <th scope="col">Button</th>
                     </tr>
@@ -79,7 +79,7 @@
                   <tbody>
                     <tr *ngFor="let game of gameDataArr">
                         <td>{{game.gameId}}</td>
-                        <td>{{game.betSize}}</td>
+                        <td>{{game.betSize/1000000000000000000}}</td>
                         <td>{{game.score}}</td>
                         <td>
                             <button class="btn btn-primary my-2" (click)="challengeGame(game.gameId, game.betSize)">CHALLENGE</button>
