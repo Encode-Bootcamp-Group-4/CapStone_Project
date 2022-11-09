@@ -112,7 +112,7 @@ export class GameBoardChallengeComponent implements OnInit {
         console.log(res);
       });
     console.log('Challenge closed');
-    window.alert('Challenge is now closed.');
+    window.alert('Challenge is now closed. Click the "CHECK BALANCE" button ON THE NEXT PAGE to see if you have winnings.');
     this.router.navigate(['/landing-page']);
   }
 }

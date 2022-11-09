@@ -64,7 +64,10 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
   }
 
   start(currentTime: any) {
-    if(this.gameOver) return console.log('Game Over');
+    if (this.gameOver) {
+      this.submitScore();
+      return console.log('Game Over');
+    }
 
     window.requestAnimationFrame(this.start.bind(this));
     const secondsSinceLastRender = (currentTime - this.lastRenderTime) / 1000;
@@ -108,8 +111,10 @@ export class GameBoardComponent implements OnInit, AfterViewInit {
     // console.log("Score: " + this.food.currentScore);
     let user = await this.signer.getAddress();
     // console.log("User: " + user);
-    this.apiService.setGameScore(this.gameId, this.food.currentScore, user).subscribe((response) => {
-      // console.log(response);
+    this.apiService.
+    setGameScore(this.gameId, this.food.currentScore, user)
+    .subscribe((resr) => {
+      console.log(resr);
     });
     console.log("Score submitted");
     window.alert("You have submitted your score and should appear in the game catalog soon (~1-2 mins.)!")
