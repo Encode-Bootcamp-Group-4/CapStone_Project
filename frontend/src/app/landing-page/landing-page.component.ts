@@ -27,6 +27,7 @@ export class LandingPageComponent implements OnInit {
   gameDataArr: any;
   topic: any;
   public ethereum
+  isLoading = false;
 
   constructor(private router: Router, private walletService: WalletService) {
     this.ethereum = (window as any).ethereum;
@@ -61,6 +62,14 @@ export class LandingPageComponent implements OnInit {
     
   }
 
+  toggleLoading = () => {
+    // console.log('toggle loading');
+    this.isLoading = true;
+    setTimeout(() => {
+      this.isLoading = false;
+      }, 100000);
+  }
+
   _bet = new FormControl("0.01");
   async submitGame(bet: any) {
     // console.log(bet);
@@ -91,3 +100,4 @@ export class LandingPageComponent implements OnInit {
   }
 
 }
+

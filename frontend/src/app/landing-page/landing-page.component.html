@@ -56,7 +56,10 @@
             <div class="col-lg-6 col-md-8 mx-auto">
                 <h4>Enter amount you want to bet! (Min. 0.01 ETH)</h4>
                 <input type="string" class="form-control" min=0.01 max=100 placeholder="Bet Size" [formControl]="_bet"/>
-                <button class="btn btn-primary my-2" (click)="submitGame(_bet.value)">PLAY AND SUBMIT GAME</button>
+                <button class="btn btn-primary my-2" [disabled]="isLoading" (click)="submitGame(_bet.value)" (click)="toggleLoading()">
+                    <img *ngIf="isLoading" style="width:20px" src="../../assets/Images/Loading_icon.gif" />
+                    PLAY AND SUBMIT GAME
+                </button>
             </div>
         </div>
         &nbsp;
@@ -71,7 +74,7 @@
                   <thead>
                     <tr>
                         <th scope="col">Game Id</th>
-                        <th scope="col">Bet Size (WEI)</th>
+                        <th scope="col">Bet Size (ETH)</th>
                         <th scope="col">Score</th>
                         <th scope="col">Button</th>
                     </tr>
@@ -79,10 +82,12 @@
                   <tbody>
                     <tr *ngFor="let game of gameDataArr">
                         <td>{{game.gameId}}</td>
-                        <td>{{game.betSize}}</td>
+                        <td>{{game.betSize/1000000000000000000}}</td>
                         <td>{{game.score}}</td>
                         <td>
-                            <button class="btn btn-primary my-2" (click)="challengeGame(game.gameId, game.betSize)">CHALLENGE</button>
+                            <button class="btn btn-primary my-2" [disabled]="isLoading" (click)="challengeGame(game.gameId, game.betSize)">
+                                CHALLENGE
+                            </button>
                         </td>
                     </tr>
                   </tbody>
