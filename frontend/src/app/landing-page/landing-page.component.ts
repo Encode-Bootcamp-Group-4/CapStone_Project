@@ -21,11 +21,14 @@ export class LandingPageComponent implements OnInit {
   signer: any;
   user: any;
   game: any;
+  opengame: any;
   gameContract: any;
   gameABI: any;
   gameCatalog: any;
+  openGameCatalog: any;
   gameDataArr: any;
   topic: any;
+  topic2: any;
   public ethereum
   isLoading = false;
 
@@ -46,11 +49,12 @@ export class LandingPageComponent implements OnInit {
     );
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
     this.topic = game.filters.OpenGame().topics;
-    // console.log(topic);
+    // console.log(this.topic);
     let filter = {
       address: gameContract,
       topics: [this.topic[0]],
     };
+    // console.log(filter);
     etherscanProvider.getLogs(filter).then((result) => {
       this.gameCatalog = result;
       this.gameDataArr = this.gameCatalog.map(
@@ -60,6 +64,25 @@ export class LandingPageComponent implements OnInit {
         }
       );
       // console.log(this.gameDataArr);
+      this.topic2 = game.filters.CloseChallenge().topics;
+      let filter2 = {
+        address: gameContract,
+        topics: [this.topic2[0]],
+      };
+      etherscanProvider.getLogs(filter2).then((result) => {
+        this.opengame = result;
+        this.openGameCatalog = this.opengame.map(
+          (game: { topics: string[]; data: string }) => {
+            const parsed = iface.parseLog(game);
+            return parsed.args;
+          }
+        );
+      });
+      
+      // this.openGameCatalog = this.gameDataArr.filter(
+      //   (game: { score: number }) => game.score != 0
+      // );
+      // console.log(this.openGameCatalog);
     });
   }
 

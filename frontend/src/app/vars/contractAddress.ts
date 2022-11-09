@@ -1,1 +1,1 @@
-export const GAME_ADDRESS = '0x60a23b8ae4e6f289af0091daca2a52122a805574';
+export const GAME_ADDRESS = '0x8388a409762aeaef90d3813af513169fdcef190b';
