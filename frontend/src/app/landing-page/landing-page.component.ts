@@ -5,6 +5,7 @@ import { ethers } from 'ethers';
 import { GAME_ADDRESS } from '../vars/contractAddress';
 import { GAME_ABI } from '../vars/contractABI';
 import { Router } from '@angular/router';
+import * as _ from 'lodash';
 
 const gameContract = GAME_ADDRESS;
 const gameABI = GAME_ABI;
@@ -21,16 +22,18 @@ export class LandingPageComponent implements OnInit {
   signer: any;
   user: any;
   game: any;
-  opengame: any;
+  openGame: any;
   gameContract: any;
   gameABI: any;
   gameCatalog: any;
+  challengeGameCatalog: any;
   openGameCatalog: any;
   gameDataArr: any;
   topic: any;
   topic2: any;
+  filters: any;
   public ethereum
-  isLoading = false;
+  toggleLayer = false;
 
   constructor(private router: Router, private walletService: WalletService) {
     this.ethereum = (window as any).ethereum;
@@ -43,19 +46,28 @@ export class LandingPageComponent implements OnInit {
     this.walletService
       .checkWalletConnected()
       .then((accounts) => (this.walletId = accounts[0]));
+    const game = new ethers.Contract(gameContract, gameABI, this.signer);
+    this.topic = game.filters.OpenGame().topics;
+    this.topic2 = game.filters.CloseChallenge().topics;
+    // console.log(this.topic);
+    this.filters = [
+      {
+        address: gameContract,
+        topics: [this.topic[0]],
+      },
+      {
+        address: gameContract,
+        topics: [this.topic2[0]],
+      },
+    ];
+  }
+
+  ngAfterViewInit(): void {
     let etherscanProvider = new ethers.providers.EtherscanProvider(
       5,
       '5J4HFGNWQQN49RI7JMWWYDAJ5ZV6VAQ6M9'
     );
-    const game = new ethers.Contract(gameContract, gameABI, this.signer);
-    this.topic = game.filters.OpenGame().topics;
-    // console.log(this.topic);
-    let filter = {
-      address: gameContract,
-      topics: [this.topic[0]],
-    };
-    // console.log(filter);
-    etherscanProvider.getLogs(filter).then((result) => {
+    etherscanProvider.getLogs(this.filters[0]).then((result) => {
       this.gameCatalog = result;
       this.gameDataArr = this.gameCatalog.map(
         (game: { topics: string[]; data: string }) => {
@@ -64,34 +76,36 @@ export class LandingPageComponent implements OnInit {
         }
       );
       // console.log(this.gameDataArr);
-      this.topic2 = game.filters.CloseChallenge().topics;
-      let filter2 = {
-        address: gameContract,
-        topics: [this.topic2[0]],
-      };
-      etherscanProvider.getLogs(filter2).then((result) => {
-        this.opengame = result;
-        this.openGameCatalog = this.opengame.map(
+      etherscanProvider.getLogs(this.filters[1]).then((result) => {
+        this.challengeGameCatalog = result;
+        this.challengeGameCatalog = this.challengeGameCatalog.map(
           (game: { topics: string[]; data: string }) => {
             const parsed = iface.parseLog(game);
             return parsed.args;
           }
         );
+        let c: { gameId: any; }[] = [];
+        this.challengeGameCatalog.forEach((game: any) => {
+          if(game['score'] == 0) {
+            c.push(game['gameId']);
+          }
+        });
+        // console.log(c);
+        let d: { gameId: any; }[] = [];
+        this.gameDataArr.forEach((game: any) => {
+          d.push(game['gameId']);
+        });
+        // console.log(d);
+        let e = _.differenceWith(d, c, _.isEqual);
+        // console.log(e);
+        this.openGameCatalog = this.gameDataArr.filter((game: { gameId: any; }) => e.includes(game['gameId']));
+        console.log(this.openGameCatalog);
       });
-      
-      // this.openGameCatalog = this.gameDataArr.filter(
-      //   (game: { score: number }) => game.score != 0
-      // );
-      // console.log(this.openGameCatalog);
     });
   }
 
-  toggleLoading = () => {
-    // console.log('toggle loading');
-    this.isLoading = true;
-    setTimeout(() => {
-      this.isLoading = false;
-      }, 100000);
+  toggle() {
+    this.toggleLayer = true;
   }
 
   _bet = new FormControl("0.01");
@@ -99,9 +113,14 @@ export class LandingPageComponent implements OnInit {
     // console.log(bet);
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
     const options = { value: ethers.utils.parseEther(bet) };
-    const createGameTx = await game['createGame'](options);
-    await createGameTx.wait();
-    this.router.navigate(['/game-board']);
+    try {
+      const createGameTx = await game['createGame'](options);
+      await createGameTx.wait();
+      this.router.navigate(['/game-board']);
+    } catch (err) {
+      
+      window.location.reload();
+    }
   }
 
   async challengeGame(gameId: any, bet: any) {
@@ -109,35 +128,54 @@ export class LandingPageComponent implements OnInit {
     // console.log(bet);
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
     const options = { value: bet };
-    const challengeGameTx = await game['startChallenge'](gameId, options);
-    await challengeGameTx.wait();
-    this.router.navigate(['/game-board-challenge'], {
-      queryParams: { id: gameId },
-    });
+    try {
+      const challengeGameTx = await game['startChallenge'](gameId, options);
+      await challengeGameTx.wait();
+      this.router.navigate(['/game-board-challenge'], {
+        queryParams: { id: gameId },
+      });
+    } catch (err) {
+      window.alert(err);
+      window.location.reload();
+    }
   }
 
   async checkBalance() {
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
-    const amount = await game['balances'](this.user);
-    window.alert(
-      `You have ${amount/1000000000000000000} ETH in winnings! Click button below to withdraw!`
-    );
+    try {
+      const amount = await game['balances'](this.user);
+      window.alert(
+        `You have ${amount/1000000000000000000} ETH in winnings! Click button below to withdraw!`
+      );
+      window.location.reload();
+    } catch (err) {
+      window.alert(err);
+      window.location.reload();
+    }
   }
 
   async withdrawWinnings() {
     const game = new ethers.Contract(gameContract, gameABI, this.signer);
     const amount = await game['balances'](this.user);
     // console.log(amount);
-    window.alert(
-      `You have ${amount/1000000000000000000} ETH in winnings! Click confirm button in wallet to withdraw!`
-    );
-    const withdrawWinningsTx = await game['prizeWithdraw'](amount);
-    await withdrawWinningsTx.wait();
-    window.alert(
-      `You have withdrawn your winnings! ${amount/1000000000000000000} ETH should appear in your wallet shortly.`
-    );
+    try {
+      if (amount > 0) {
+        window.alert(
+          `You have ${amount/1000000000000000000} ETH in winnings! Click confirm button in wallet to withdraw!`
+        );
+        const withdrawTx = await game['prizeWithdraw'](amount);
+        await withdrawTx.wait();
+        window.alert(`Withdraw successful! ${amount/1000000000000000000} ETH should appear in your wallet shortly!`);
+        window.location.reload();
+      } else {
+        window.alert('You have no winnings to withdraw!');
+        window.location.reload();
+      }
+    } catch (err) {
+      window.alert(err);
+      window.location.reload();
+    }
   }
 
-  async test() {}
 }
 

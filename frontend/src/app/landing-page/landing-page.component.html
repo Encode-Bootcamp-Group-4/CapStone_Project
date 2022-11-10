@@ -34,7 +34,7 @@
     </header>
 
     <main>
-    <div class="backgroundImage"></div>
+    <div class="backgroundImage disable-background" *ngIf="toggleLayer"></div>
     <!-- Title and Rules section (Edit modal for game rules) -->
     <section class="py-5 text-center container">
         <div class="row py-lg-5">
@@ -56,8 +56,7 @@
             <div class="col-lg-6 col-md-8 mx-auto">
                 <h4>Enter amount you want to bet! (Min. 0.01 ETH)</h4>
                 <input type="string" class="form-control" min=0.01 max=100 placeholder="Bet Size" [formControl]="_bet"/>
-                <button class="btn btn-primary my-2" [disabled]="isLoading" (click)="submitGame(_bet.value)" (click)="toggleLoading()">
-                    <img *ngIf="isLoading" style="width:20px" src="../../assets/Images/Loading_icon.gif" />
+                <button class="btn btn-primary my-2" (click)="submitGame(_bet.value)" (click)="toggle()">
                     PLAY AND SUBMIT GAME
                 </button>
             </div>
@@ -85,7 +84,7 @@
                         <td>{{game.betSize/1000000000000000000}}</td>
                         <td>{{game.score}}</td>
                         <td>
-                            <button class="btn btn-primary my-2" [disabled]="isLoading" (click)="challengeGame(game.gameId, game.betSize)">
+                            <button class="btn btn-primary my-2" (click)="challengeGame(game.gameId, game.betSize)" (click)="toggle()">
                                 CHALLENGE
                             </button>
                         </td>
@@ -102,7 +101,7 @@
             <div class="col-lg-6 col-md-8 mx-auto">
             <h1 class="fw-light">Click button below to see if you have winnings!</h1>
             <p>
-                <button type="button" class="btn btn-primary" (click)="checkBalance()">
+                <button type="button" class="btn btn-primary" (click)="checkBalance()" (click)="toggle()">
                     CHECK BALANCE
                 </button>
             </p>
@@ -116,7 +115,7 @@
             <div class="col-lg-6 col-md-8 mx-auto">
             <h1 class="fw-light">Click button below to withdraw your winnings!</h1>
             <p>
-                <button type="button" class="btn btn-primary" (click)="withdrawWinnings()">
+                <button type="button" class="btn btn-primary" (click)="withdrawWinnings()" (click)="toggle()">
                     WITHDRAW WINNINGS
                 </button>
             </p>
