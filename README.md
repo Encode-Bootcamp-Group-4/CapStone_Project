@@ -5,16 +5,16 @@ __Links__
 
 [Watch Our Video Demo](ADD YT LINK HERE)
 
-[Presentation Slides](ADD SLIDES LINK HERE)
+[Presentation Slides](https://docs.google.com/presentation/d/1AoyyWEC8vxm00QakARM5ERsKeAsLiwejZu_rI8u8kiE/edit#slide=id.p)
 
 __Team Members__
 First Name | Last Name | Discord
 ------------ | ------------- | -------------
 Bryce | Palichuk | bchuk#8913
-Maxwell | ? | bearmans#0295 
+Maxwell | Saal | bearmans#0295 
 Marco | Germanier | r-x-x#8344 
 David  | Shaw | thatboi#8495
-Ric | ? | Ric#6871
+Ric | P | Ric#6871
 
 __Project Description__
 
