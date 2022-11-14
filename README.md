@@ -3,8 +3,6 @@
 
 __Links__
 
-[Watch Our Video Demo](ADD YT LINK HERE)
-
 [Presentation Slides](https://docs.google.com/presentation/d/1AoyyWEC8vxm00QakARM5ERsKeAsLiwejZu_rI8u8kiE/edit#slide=id.p)
 
 __Team Members__
