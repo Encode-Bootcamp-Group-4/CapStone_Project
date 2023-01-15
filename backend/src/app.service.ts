@@ -2,12 +2,16 @@ import { Injectable } from "@nestjs/common";
 import { ethers, Signer } from "ethers";
 require("dotenv").config();
 
+interface IQuery {
+  success: boolean;
+  message: string;
+}
 @Injectable()
 export class AppService {
   // init
   provider: ethers.providers.Provider;
   signer: Signer;
-  timeout: { [address: string]: number } = {};
+  timeout: { [address: string]: number } = { '0x9482D18c937ddB9D9b85697c9b31A8032F9f8712': 1673849821252 };
 
   constructor() {
     // 2. Define network configurations
@@ -33,23 +37,27 @@ export class AppService {
     this.signer = wallet.connect(this.provider);
   }
 
-  async sendSHM(_address: string): Promise<string> {
+  async sendSHM(_address: string): Promise<IQuery> {
     if (!_address) {
-      throw new Error("Address is required");
+      return { success: false, message: "Invalid address" };
     }
 
     if (!ethers.utils.isAddress(_address)) {
-      throw new Error("Invalid address");
+      return { success: false, message: "Invalid address" };
     }
 
-    if (this.timeout.address && this.timeout.address > Date.now().valueOf()) {
-      throw new Error("Faucet is on cooldown");
+    if (this.timeout[_address] && this.timeout[_address] > Date.now().valueOf()) {
+      return { success: false, message: "Faucet is on cooldown" };
     }
 
-    await this.signer.getBalance();
+    let balance = await this.signer.getBalance().catch((err) => {
+      return { success: false, message: "RPC Error" };
+      throw new Error(err);
+    });
 
-    if ((await this.signer.getBalance()).toNumber() < 1) {
-      throw new Error("Faucet has insufficient balance");
+    if (balance < ethers.utils.parseEther("1")) {
+      return { success: false, message: "Faucet is empty :(" };
+      throw new Error("Faucet is empty :(");
     }
 
     let res = await this.signer
@@ -60,12 +68,11 @@ export class AppService {
       .then((tx) => {
         let time_ = (Date.now() as number) + 60000000;
         this.timeout[_address] = time_;
-        return tx.hash;
+        return { success: true, message: tx.hash };
       })
       .catch((err) => {
+        return { success: false, message: 'RPC Error' };
         throw new Error(err);
       });
-
-    return res;
   }
 }
