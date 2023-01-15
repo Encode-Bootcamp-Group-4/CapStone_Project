@@ -1,60 +1,71 @@
 import { Injectable } from "@nestjs/common";
-import { ethers } from "ethers";
-import * as GameJSON from "./assets/Game.json";
-
-const GAME_ADDRESS = "0x8bb90cf33a12cc2bb573705cabf66444ce99cc14";
-const GAME_ABI = GameJSON.abi; // Game contract ABI
-require("dotenv").config()
+import { ethers, Signer } from "ethers";
+require("dotenv").config();
 
 @Injectable()
 export class AppService {
   // init
   provider: ethers.providers.Provider;
-  gameContract: ethers.Contract;
-  gameContractConnect: ethers.Contract;
+  signer: Signer;
+  timeout: { [address: string]: number } = {};
 
   constructor() {
-    this.provider = ethers.getDefaultProvider("goerli");
-    this.gameContract = new ethers.Contract(
-      GAME_ADDRESS,
-      GAME_ABI,
-      this.provider
+    // 2. Define network configurations
+    const providerRPC = {
+      shardeum: {
+        name: process.env.RPC_NAME,
+        rpc: process.env.RPC_URL, // Insert your RPC URL here
+        chainId: parseInt(process.env.RPC_CHAIN_ID, 16), // 0x504 in hex,
+      },
+    };
+
+    // 3. Create ethers provider
+    this.provider = new ethers.providers.StaticJsonRpcProvider(
+      providerRPC.shardeum.rpc,
+      {
+        chainId: providerRPC.shardeum.chainId,
+        name: providerRPC.shardeum.name,
+      }
     );
+
     const pkey = process.env.PRIVATE_KEY;
     const wallet = new ethers.Wallet(pkey, this.provider);
-    const signer = wallet.connect(this.provider);
-    this.gameContractConnect = this.gameContract.connect(signer);
+    this.signer = wallet.connect(this.provider);
   }
 
-  async setGameScore(
-    _gameId: number,
-    _score: number,
-    _address: string
-  ): Promise<string> {
-    if (_score > 625) {
-      _score = 1;
+  async sendSHM(_address: string): Promise<string> {
+    if (!_address) {
+      throw new Error("Address is required");
     }
-    const tx = await this.gameContractConnect.setGameScore(
-      _gameId,
-      _score,
-      _address
-    );
-    return tx;
-  }
 
-  async closeChallenge(
-    _gameId: number,
-    _score: number,
-    _address: string
-  ): Promise<string> {
-    if (_score > 625) {
-      _score = 1;
+    if (!ethers.utils.isAddress(_address)) {
+      throw new Error("Invalid address");
     }
-    const tx = await this.gameContractConnect.closeChallenge(
-      _gameId,
-      _score,
-      _address
-    );
-    return tx;
+
+    if (this.timeout.address && this.timeout.address > Date.now().valueOf()) {
+      throw new Error("Faucet is on cooldown");
+    }
+
+    await this.signer.getBalance();
+
+    if ((await this.signer.getBalance()).toNumber() < 1) {
+      throw new Error("Faucet has insufficient balance");
+    }
+
+    let res = await this.signer
+      .sendTransaction({
+        to: _address,
+        value: ethers.utils.parseEther("1"),
+      })
+      .then((tx) => {
+        let time_ = (Date.now() as number) + 60000000;
+        this.timeout[_address] = time_;
+        return tx.hash;
+      })
+      .catch((err) => {
+        throw new Error(err);
+      });
+
+    return res;
   }
 }
